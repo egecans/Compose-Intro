@@ -19,7 +19,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -64,7 +68,45 @@ class MainActivity : ComponentActivity() {
             //ShowImage()
             //StylishText(fontFamily)
             //TwoBoxes()
-            ButtonWithReply( )
+            LazyColumnList()
+        }
+    }
+
+    // this is for hardcoded, limited size list which won't hard the ram to scroll
+    @Composable fun HardCodedList(){
+        val scrollState = rememberScrollState()
+        Column(Modifier.verticalScroll(scrollState)) {
+            for (i in 1..20){
+                Text(text = "Item $i",
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp))
+            }
+        }
+    }
+    @Composable fun LazyColumnList(){
+        LazyColumn {
+            val list = listOf("Hello","There","This","is","SPARTAAA!")
+            itemsIndexed(list){ index, item ->
+                Text(text = item,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp))
+            }
+            /* hardCoded for indices
+            items(5000){// for loop it -> i oluyo, recyclerView ?
+                Text(text = "Item $it",
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp))
+            }
+             */
         }
     }
 
@@ -256,7 +298,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun GreetingPreview() {
         JetPackComposeIntroTheme {
-            ColumnRowModifier("Hello","World")
+            HardCodedList()
+            //ColumnRowModifier("Hello","World")
             //Greeting("Android")
         }
     }
