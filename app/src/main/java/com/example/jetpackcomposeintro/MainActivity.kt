@@ -11,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,19 +18,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,8 +48,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.example.jetpackcomposeintro.ui.theme.JetPackComposeIntroTheme
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -65,10 +63,46 @@ class MainActivity : ComponentActivity() {
             //ColumnRowModifier("Hello","World")
             //ShowImage()
             //StylishText(fontFamily)
-            TwoBoxes()
+            //TwoBoxes()
+            ButtonWithReply( )
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable fun ButtonWithReply() {
+        var textFieldState by remember { // instead of val text = remember -> mutableStatOf<String> yerine direkt string o yüzden .val'e gerek kalmıyor
+            mutableStateOf(" ")
+        }
+        val scaffoldState = rememberBottomSheetScaffoldState()
+        val scope = rememberCoroutineScope()
+        BottomSheetScaffold(scaffoldState = scaffoldState,
+            modifier = Modifier.fillMaxSize(),
+            sheetContent = {
+
+            }) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(30.dp)
+            ){
+                TextField(value = textFieldState ,
+                    label = { Text("Enter your name") } , // hint
+                    onValueChange = { textFieldState = it},
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    scope.launch { // usage of coroutine only ok for callbacks like onClickListener in Compose Functions
+                        scaffoldState.snackbarHostState.showSnackbar("Hello $textFieldState")
+                    }
+                }) {
+                    Text(text = "Button Name  ")
+                }
+            }
+        }
+    }
 
     // when clicking upper box, bottom boxes color will change
     @Composable fun TwoBoxes(modifier: Modifier = Modifier){
@@ -76,18 +110,21 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(Color.Yellow) //livedata gibi ama valuesu değiştikçe callanmadan değişiyor
         }
         Column(Modifier.fillMaxSize()) {
-            ColorBox(modifier
-                .weight(1f)
-                .fillMaxSize()){
+            ColorBox(
+                modifier
+                    .weight(1f)
+                    .fillMaxSize()){
                 // bottom color uses this value, when we click on the upper, it will change the bottom's color
                 color.value = it
             }
-            Box(Modifier
-                .weight(1f)
-                .fillMaxSize()
-                .background(color.value))
+            Box(
+                Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+                    .background(color.value))
         }
     }
+
 
     // redraw UI Components -> redrawing
     @Composable fun ColorBox(modifier: Modifier = Modifier,
